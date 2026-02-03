@@ -1,5 +1,5 @@
 WITH source AS (
-    SELECT * FROM {{ source('postgres_public', 'fields') }}
+    SELECT * FROM {{ source('pg_pipedrive_crm', 'fields') }}
 )
 
 SELECT

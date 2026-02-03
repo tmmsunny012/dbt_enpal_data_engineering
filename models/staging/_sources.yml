@@ -1,7 +1,7 @@
 version: 2
 
 sources:
-  - name: postgres_public
+  - name: pg_pipedrive_crm
     description: "Raw Pipedrive CRM data loaded from CSV files"
     database: postgres
     schema: public

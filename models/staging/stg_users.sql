@@ -9,7 +9,7 @@
 */
 
 WITH source AS (
-    SELECT * FROM {{ source('postgres_public', 'users') }}
+    SELECT * FROM {{ source('pg_pipedrive_crm', 'users') }}
 )
 
 SELECT

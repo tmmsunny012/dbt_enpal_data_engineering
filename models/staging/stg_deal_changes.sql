@@ -1,5 +1,5 @@
 WITH source AS (
-    SELECT * FROM {{ source('postgres_public', 'deal_changes') }}
+    SELECT * FROM {{ source('pg_pipedrive_crm', 'deal_changes') }}
 )
 
 SELECT
