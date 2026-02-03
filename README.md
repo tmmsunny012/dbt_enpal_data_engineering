@@ -102,6 +102,8 @@ Raw Sources (Postgres)
   - Customer Not Ready: 1,146 deals 
   - Duplicate Entry: 1,131 deals 
 
+**Reference:** See full analysis in [`analysis/notebooks/model_analysis.ipynb`](analysis/notebooks/model_analysis.ipynb)
+
 **Why:** Shows thorough data exploration and business thinking beyond requirements.
 
 ### 3. Month Format Standardization
@@ -129,6 +131,8 @@ Raw Sources (Postgres)
 - Shows `stg_users` and `stg_activities` are actually reused
 - Proves architecture supports "many other requests in future" (per task requirement)
 - Only 25 lines of SQL because foundation is solid
+
+**Reference:** See full visualization (Stacked Bar Chart) in [`analysis/notebooks/model_analysis.ipynb`](analysis/notebooks/model_analysis.ipynb)
 
 **Why:** Demonstrates forward-thinking architecture, not just solving for one report.
 
@@ -217,21 +221,20 @@ You can run the exploratory data analysis notebook to see the data profiling and
     *   `exploratory_analysis.ipynb`: Data profiling and raw data checks.
     *   `model_analysis.ipynb`: Final funnel metrics and sales performance visualization.
 4.  **Note**: The environment comes pre-configured with pandas, sqlalchemy, and connection drivers.
-```
 
 ### Database Credentials
 
-```
-Host: localhost
-User: admin
-Password: admin
-Port: 5432
-Database: postgres
-```
+| Parameter | Value |
+| :--- | :--- |
+| **Host** | `localhost` |
+| **User** | `admin` |
+| **Password** | `admin` |
+| **Port** | `5432` |
+| **Database** | `postgres` |
 
 ### Project Structure
 
-```
+```text
 dbt_enpal_data_engineering/
 ├── models/
 │   ├── staging/           # Bronze layer (6 models)
@@ -241,12 +244,12 @@ dbt_enpal_data_engineering/
 │   ├── intermediate/      # Silver layer (4 models)
 │   │   ├── _schema.yml
 │   │   └── *.sql
-│   └── marts/            # Gold layer (2 models)
+│   └── marts/             # Gold layer (2 models)
 │       ├── _schema.yml
 │       └── *.sql
-├── raw_data/             # CSV source files
-├── docker-compose.yml    # PostgreSQL + pgAdmin
-└── dbt_project.yml       # dbt configuration
+├── raw_data/              # CSV source files
+├── docker-compose.yml     # PostgreSQL + pgAdmin
+└── dbt_project.yml        # dbt configuration
 ```
 
 ---
