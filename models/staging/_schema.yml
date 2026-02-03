@@ -1,0 +1,102 @@
+version: 2
+
+models:
+  - name: stg_stages
+    description: "Cleaned sales funnel stages with funnel step numbers"
+    columns:
+      - name: stage_id
+        description: "Primary key for stages"
+        tests:
+          - unique
+          - not_null
+      - name: stage_name
+        description: "Name of the sales funnel stage"
+        tests:
+          - not_null
+      - name: funnel_step
+        description: "Numeric step in the funnel (1-9)"
+        tests:
+          - not_null
+
+  - name: stg_activity_types
+    description: "Lookup table for activity types with cleaned column names"
+    columns:
+      - name: activity_type_id
+        description: "Primary key for activity types"
+        tests:
+          - unique
+          - not_null
+      - name: activity_type_code
+        description: "Code used in activity table (meeting, sc_2, follow_up, after_close_call)"
+        tests:
+          - not_null
+      - name: activity_type_name
+        description: "Human-readable name for the activity type"
+        tests:
+          - not_null
+
+  - name: stg_activities
+    description: "Sales activities linked to deals (note: source data contains duplicate activity_ids)"
+    columns:
+      - name: activity_id
+        description: "Activity identifier (not unique in source data)"
+        tests:
+          - not_null
+      - name: activity_type_code
+        description: "Foreign key to activity_types"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['meeting', 'sc_2', 'follow_up', 'after_close_call']
+      - name: deal_id
+        description: "Foreign key to deals"
+        tests:
+          - not_null
+
+  - name: stg_deal_changes
+    description: "Historical changes to deals including stage transitions"
+    columns:
+      - name: deal_id
+        description: "Foreign key to deals"
+        tests:
+          - not_null
+      - name: changed_at
+        description: "Timestamp when the change occurred"
+        tests:
+          - not_null
+      - name: changed_field_key
+        description: "Field that was changed"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['stage_id', 'user_id', 'add_time', 'lost_reason']
+
+  - name: stg_users
+    description: "Sales team members with PII masked for GDPR compliance"
+    columns:
+      - name: user_id
+        description: "Primary key for users"
+        tests:
+          - unique
+          - not_null
+      - name: name_masked
+        description: "Masked name showing only initials"
+        tests:
+          - not_null
+      - name: email_hash
+        description: "SHA256 hashed email for pseudonymization"
+        tests:
+          - not_null
+
+  - name: stg_fields
+    description: "Field definitions with value options"
+    columns:
+      - name: field_id
+        description: "Primary key for fields"
+        tests:
+          - unique
+          - not_null
+      - name: field_key
+        description: "Field key identifier"
+        tests:
+          - not_null
