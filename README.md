@@ -196,7 +196,7 @@ Raw Sources (Postgres)
 Since this project is fully containerized, you can run all dbt commands through Docker without installing dbt locally.
 
 ```bash
-# 1. Start PostgreSQL & Docs Server
+# 1. Start PostgreSQL & Docs Server (Access docs at http://localhost:8080)
 docker compose up -d
 
 # 2. Run dbt models via Docker
