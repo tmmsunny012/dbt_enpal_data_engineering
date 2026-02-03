@@ -191,7 +191,27 @@ Raw Sources (Postgres)
 1. Docker Desktop installed and running
 2. dbt-core and dbt-postgres installed (`pip install dbt-core dbt-postgres`)
 
-### Quick Start
+### Running via Docker (No Local Install Needed)
+
+Since this project is fully containerized, you can run all dbt commands through Docker without installing dbt locally.
+
+```bash
+# 1. Start PostgreSQL & Docs Server
+docker compose up -d
+
+# 2. Run dbt models via Docker
+docker compose run --rm dbt -c "dbt run"
+
+# 3. Run dbt tests via Docker
+docker compose run --rm dbt -c "dbt test"
+
+# 4. Query the reports (via dbt)
+docker compose run --rm dbt -c "dbt show --inline 'select * from public_marts.rep_sales_funnel_monthly order by funnel_step'"
+```
+
+### Quick Start (Local dbt)
+
+If you have dbt installed locally:
 
 ```bash
 # 1. Start PostgreSQL database
