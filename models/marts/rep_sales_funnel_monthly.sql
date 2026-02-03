@@ -15,6 +15,7 @@
     - Step 7: Implementation/Onboarding
     - Step 8: Follow-up/Customer Success
     - Step 9: Renewal/Expansion
+    - Lost: Deals marked as lost (with reason)
 */
 
 -- Stage-based funnel steps (1-9)
@@ -43,11 +44,24 @@ activity_funnel AS (
     GROUP BY activity_month, funnel_activity_name
 ),
 
--- Combine stage and activity metrics
+-- Lost deals (exit from funnel)
+lost_funnel AS (
+    SELECT
+        lost_month AS month,
+        'Lost' AS kpi_name,
+        'Lost' AS funnel_step,
+        COUNT(DISTINCT deal_id) AS deals_count
+    FROM {{ ref('int_deal_losses') }}
+    GROUP BY lost_month
+),
+
+-- Combine stage, activity, and lost metrics
 combined AS (
     SELECT * FROM stage_funnel
     UNION ALL
     SELECT * FROM activity_funnel
+    UNION ALL
+    SELECT * FROM lost_funnel
 )
 
 SELECT

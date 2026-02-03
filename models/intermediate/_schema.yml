@@ -58,3 +58,41 @@ models:
               values:
                 - 'Sales Call 1'
                 - 'Sales Call 2'
+
+  - name: int_deal_losses
+    description: "Lost deals with categorized loss reasons"
+    columns:
+      - name: deal_id
+        description: "Foreign key to deals"
+        tests:
+          - not_null
+      - name: lost_at
+        description: "Timestamp when the deal was marked as lost"
+        tests:
+          - not_null
+      - name: lost_month
+        description: "Month when the deal was lost (YYYY-MM format)"
+        tests:
+          - not_null
+      - name: lost_reason_id
+        description: "ID of the loss reason (1-5)"
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - 1
+                - 2
+                - 3
+                - 4
+                - 5
+      - name: lost_reason_label
+        description: "Human-readable loss reason"
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - 'Customer Not Ready'
+                - 'Pricing Issues'
+                - 'Unreachable Customer'
+                - 'Product Mismatch'
+                - 'Duplicate Entry'

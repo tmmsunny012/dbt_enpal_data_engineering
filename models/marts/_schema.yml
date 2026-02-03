@@ -13,7 +13,7 @@ models:
         tests:
           - not_null
       - name: funnel_step
-        description: "Funnel step number (1, 2, 2.1, 3, 3.1, 4, 5, 6, 7, 8, 9)"
+        description: "Funnel step number (1, 2, 2.1, 3, 3.1, 4, 5, 6, 7, 8, 9, Lost)"
         tests:
           - not_null
           - accepted_values:
@@ -29,6 +29,7 @@ models:
                 - '7'
                 - '8'
                 - '9'
+                - 'Lost'
       - name: deals_count
         description: "Count of unique deals that reached this funnel step in the month"
         tests:
