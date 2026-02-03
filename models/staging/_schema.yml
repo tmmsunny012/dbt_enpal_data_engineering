@@ -47,7 +47,11 @@ models:
         tests:
           - not_null
           - accepted_values:
-              values: ['meeting', 'sc_2', 'follow_up', 'after_close_call']
+              values:
+                - 'meeting'
+                - 'sc_2'
+                - 'follow_up'
+                - 'after_close_call'
       - name: deal_id
         description: "Foreign key to deals"
         tests:
@@ -69,7 +73,11 @@ models:
         tests:
           - not_null
           - accepted_values:
-              values: ['stage_id', 'user_id', 'add_time', 'lost_reason']
+              values:
+                - 'stage_id'
+                - 'user_id'
+                - 'add_time'
+                - 'lost_reason'
 
   - name: stg_users
     description: "Sales team members with PII masked for GDPR compliance"
