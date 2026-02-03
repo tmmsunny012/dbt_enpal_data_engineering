@@ -194,7 +194,7 @@ Raw Sources (Postgres)
 docker compose up -d
 
 # 2. Wait for data to load (check with)
-docker logs dbt_enpal_data_engineering-data_loader-1
+docker compose logs -f data_loader
 
 # 3. Run dbt models
 dbt run
