@@ -1,0 +1,35 @@
+version: 2
+
+models:
+  - name: rep_sales_funnel_monthly
+    description: "Monthly sales funnel report tracking deal counts through each funnel step"
+    columns:
+      - name: month
+        description: "The month of the funnel metric (truncated to first day)"
+        tests:
+          - not_null
+      - name: kpi_name
+        description: "Name of the funnel step or KPI"
+        tests:
+          - not_null
+      - name: funnel_step
+        description: "Funnel step number (1, 2, 2.1, 3, 3.1, 4, 5, 6, 7, 8, 9)"
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - '1'
+                - '2'
+                - '2.1'
+                - '3'
+                - '3.1'
+                - '4'
+                - '5'
+                - '6'
+                - '7'
+                - '8'
+                - '9'
+      - name: deals_count
+        description: "Count of unique deals that reached this funnel step in the month"
+        tests:
+          - not_null
