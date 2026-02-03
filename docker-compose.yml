@@ -34,3 +34,16 @@ services:
       - "5050:80"
     depends_on:
       - db
+
+  jupyter:
+    image: jupyter/scipy-notebook:latest
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./analysis/notebooks:/home/jovyan/work
+    environment:
+      - JUPYTER_TOKEN=admin
+    depends_on:
+      - db
+    # Install drivers on startup so we can connect to Postgres
+    command: bash -c "pip install psycopg2-binary sqlalchemy ipython-sql && start-notebook.sh --NotebookApp.token='admin'"

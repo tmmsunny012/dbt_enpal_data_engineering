@@ -208,6 +208,17 @@ SELECT * FROM public_marts.rep_sales_funnel_monthly
 ORDER BY month, funnel_step;
 ```
 
+### Interactive Analysis (Jupyter Notebook)
+You can run the exploratory data analysis notebook to see the data profiling and visualization.
+
+1.  **Access Jupyter**: Open http://localhost:8888 in your browser.
+2.  **Login**: Use the token `admin`.
+3.  **Run**:
+    *   `exploratory_analysis.ipynb`: Data profiling and raw data checks.
+    *   `model_analysis.ipynb`: Final funnel metrics and sales performance visualization.
+4.  **Note**: The environment comes pre-configured with pandas, sqlalchemy, and connection drivers.
+```
+
 ### Database Credentials
 
 ```
