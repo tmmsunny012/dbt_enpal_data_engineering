@@ -29,3 +29,4 @@ Thumbs.db
 # Secrets (never commit credentials)
 secrets.yml
 profiles_local.yml
+.user.yml
