@@ -34,3 +34,35 @@ models:
         description: "Count of unique deals that reached this funnel step in the month"
         tests:
           - not_null
+
+  - name: rep_sales_rep_performance_monthly
+    description: "Monthly sales rep performance metrics showing activity completion and workload"
+    columns:
+      - name: month
+        description: "The month of the performance metric (YYYY-MM format)"
+        tests:
+          - not_null
+      - name: sales_rep_name
+        description: "Masked sales rep name (PII compliant)"
+        tests:
+          - not_null
+      - name: deals_worked
+        description: "Number of unique deals the rep worked on in the month"
+        tests:
+          - not_null
+      - name: activities_completed
+        description: "Total number of activities completed by the rep"
+        tests:
+          - not_null
+      - name: sales_call_1_completed
+        description: "Number of Sales Call 1 (meetings) completed"
+        tests:
+          - not_null
+      - name: sales_call_2_completed
+        description: "Number of Sales Call 2 completed"
+        tests:
+          - not_null
+      - name: other_activities
+        description: "Number of other activities (follow-ups, after-close calls) completed"
+        tests:
+          - not_null

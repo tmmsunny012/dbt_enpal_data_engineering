@@ -12,7 +12,8 @@ This layer contains final reporting models ready for business consumption.
 
 | Model | Description | Output |
 |-------|-------------|--------|
-| `rep_sales_funnel_monthly` | Monthly sales funnel metrics | 128 rows (as of current data) |
+| `rep_sales_funnel_monthly` | Monthly sales funnel metrics | 142 rows (as of current data) |
+| `rep_sales_rep_performance_monthly` | Monthly sales rep performance and activity metrics | 1,383 rows (as of current data) |
 
 ## rep_sales_funnel_monthly
 
@@ -44,13 +45,15 @@ Tracks deal counts through each step of the sales funnel by month.
 | 7 | Implementation/Onboarding | Stage transition |
 | 8 | Follow-up/Customer Success | Stage transition |
 | 9 | Renewal/Expansion | Stage transition |
+| Lost | Lost | Deal loss event |
 
 ### Data Flow
 
 ```
 int_deal_stage_transitions ──┐
                              ├──► rep_sales_funnel_monthly
-int_deal_activities ─────────┘
+int_deal_activities ─────────┤
+int_deal_losses ─────────────┘
 ```
 
 ### Sample Output
@@ -71,11 +74,58 @@ Marts models are materialized as **tables** to:
 - Provide stable snapshots for reporting
 - Reduce load on underlying views
 
+---
+
+## rep_sales_rep_performance_monthly
+
+### Description
+
+Tracks sales rep activity and workload by month. Demonstrates architecture supports multiple reporting use cases beyond the primary funnel report.
+
+### Output Schema
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `month` | string | Month in YYYY-MM format |
+| `sales_rep_name` | string | Masked sales rep name (PII compliant) |
+| `deals_worked` | integer | Number of unique deals worked on |
+| `activities_completed` | integer | Total activities completed |
+| `sales_call_1_completed` | integer | Number of Sales Call 1 (meetings) |
+| `sales_call_2_completed` | integer | Number of Sales Call 2 |
+| `other_activities` | integer | Follow-ups and after-close calls |
+
+### Data Flow
+
+```
+stg_activities ──┐
+                 ├──► rep_sales_rep_performance_monthly
+stg_users ───────┘
+```
+
+### Sample Output
+
+```
+| month   | sales_rep_name | deals_worked | activities_completed | sales_call_1 | sales_call_2 |
+|---------|----------------|--------------|----------------------|--------------|--------------|
+| 2024-01 | A*** G***      | 7            | 28                   | 12           | 4            |
+| 2024-01 | J*** M***      | 7            | 28                   | 16           | 4            |
+| 2024-02 | K*** S***      | 5            | 20                   | 4            | 0            |
+```
+
+### Business Value
+
+- **Sales team performance management**: Track rep productivity over time
+- **Workload distribution analysis**: Identify overloaded or underutilized reps
+- **Activity type patterns**: Understand which reps focus on which activities
+- **PII compliance**: Uses masked names from stg_users for GDPR compliance
+
+---
+
 ## Tests
 
-5 data tests validate:
+12 data tests validate both models:
 - Not null constraints on all columns
-- Accepted values for `funnel_step` (1-9 and sub-steps)
+- Accepted values for `funnel_step` (1-9, sub-steps, and Lost)
 
 Run tests with:
 ```bash
