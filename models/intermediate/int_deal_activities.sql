@@ -49,7 +49,8 @@ SELECT
 
     -- Map to funnel sub-step name for reporting
     -- This makes it easier to union with stage-based funnel metrics
-    CASE activity_type_code
+    -- Normalizing activity_type_code to lower case
+    CASE LOWER(activity_type_code)
         WHEN 'meeting' THEN 'Sales Call 1'  -- Funnel step 2.1
         WHEN 'sc_2' THEN 'Sales Call 2'      -- Funnel step 3.1
         ELSE 'Other'  -- Filtered out below, but included for safety
@@ -58,4 +59,4 @@ SELECT
 FROM completed_activities
 
 -- Only include activities that map to funnel sub-steps
-WHERE activity_type_code IN ('meeting', 'sc_2')
+WHERE LOWER(activity_type_code) IN ('meeting', 'sc_2')

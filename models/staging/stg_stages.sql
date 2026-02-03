@@ -27,17 +27,19 @@ SELECT
     stage_name,
 
     -- Map stage names to funnel step numbers (stored as text for consistency)
+    -- Normalizing stage_name to lower case for robust matching
+    -- regardless of input casing variations (e.g., "Lead Generation" vs "lead generation")
     -- Used for ordering and filtering in funnel reports
-    CASE stage_name
-        WHEN 'Lead Generation' THEN '1'
-        WHEN 'Qualified lead' THEN '2'
-        WHEN 'Needs Assessment' THEN '3'
-        WHEN 'Proposal/Quote Preparation' THEN '4'
-        WHEN 'Negotiation' THEN '5'
-        WHEN 'Closing' THEN '6'
-        WHEN 'Implementation/Onboarding' THEN '7'
-        WHEN 'Follow-up/Customer Success' THEN '8'
-        WHEN 'Renewal/Expansion' THEN '9'
+    CASE LOWER(stage_name)
+        WHEN 'lead generation' THEN '1'
+        WHEN 'qualified lead' THEN '2'
+        WHEN 'needs assessment' THEN '3'
+        WHEN 'proposal/quote preparation' THEN '4'
+        WHEN 'negotiation' THEN '5'
+        WHEN 'closing' THEN '6'
+        WHEN 'implementation/onboarding' THEN '7'
+        WHEN 'follow-up/customer success' THEN '8'
+        WHEN 'renewal/expansion' THEN '9'
     END AS funnel_step
 
 FROM source
