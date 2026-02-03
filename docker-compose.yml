@@ -9,7 +9,7 @@ services:
       POSTGRES_PASSWORD: admin
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-      - ./raw_data:/raw_data  # Mount raw_data folder to access CSV files
+      - ./raw_data:/raw_data # Mount raw_data folder to access CSV files
     ports:
       - "5432:5432"
 
@@ -47,3 +47,22 @@ services:
       - db
     # Install drivers on startup so we can connect to Postgres
     command: bash -c "pip install psycopg2-binary sqlalchemy ipython-sql && start-notebook.sh --NotebookApp.token='admin'"
+
+  dbt:
+    image: ghcr.io/dbt-labs/dbt-postgres:1.7.0
+    restart: always
+    volumes:
+      - ./:/usr/app
+      - ./profiles.yml:/usr/app/profiles.yml
+    working_dir: /usr/app
+    environment:
+      - DBT_PROFILES_DIR=/usr/app
+      - DBT_HOST=db
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+    depends_on:
+      - db
+    entrypoint: /bin/bash
+    ports:
+      - "8080:8080"
+    command: -c "dbt docs generate && python -m http.server 8080 --directory target"
