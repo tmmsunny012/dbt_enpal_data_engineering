@@ -28,7 +28,7 @@ on:
   pull_request:
     branches:
       - main
-      - sales-funnel-model
+
     # Only trigger if these file types change (optimization)
     paths:
       - 'models/**'
@@ -41,6 +41,7 @@ on:
   push:
     branches:
       - main
+      - sales-funnel-model
     paths:
       - 'models/**'
       - 'macros/**'
