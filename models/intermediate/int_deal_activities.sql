@@ -1,5 +1,6 @@
 /*
     Intermediate model: Completed sales activities per deal.
+    
 
     Purpose:
     - Tracks completion of key sales activities (calls/meetings)
