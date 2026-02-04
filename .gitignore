@@ -1,0 +1,38 @@
+# dbt
+target/
+dbt_packages/
+dbt_internal_packages/
+logs/
+dbt_modules/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+venv/
+.venv/
+env/
+.env
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets (never commit credentials)
+secrets.yml
+profiles_local.yml
+.user.yml
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
+ipython_config.py
+*.ipynb_checkpoints

@@ -1,0 +1,20 @@
+version: 2
+
+sources:
+  - name: pg_pipedrive_crm
+    description: "Raw Pipedrive CRM data loaded from CSV files"
+    database: postgres
+    schema: public
+    tables:
+      - name: activity
+        description: "Sales activities linked to deals"
+      - name: activity_types
+        description: "Lookup table for activity types"
+      - name: deal_changes
+        description: "Historical changes to deals (stage transitions, owner changes, etc.)"
+      - name: fields
+        description: "Field definitions with value options"
+      - name: stages
+        description: "Sales funnel stage definitions"
+      - name: users
+        description: "Sales team members (contains PII)"

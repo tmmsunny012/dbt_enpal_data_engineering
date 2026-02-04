@@ -1,0 +1,98 @@
+version: 2
+
+models:
+  - name: int_deals
+    description: "One row per deal with creation metadata"
+    columns:
+      - name: deal_id
+        description: "Unique identifier for the deal"
+        tests:
+          - unique
+          - not_null
+      - name: created_at
+        description: "Timestamp when the deal was created"
+        tests:
+          - not_null
+      - name: created_month
+        description: "Month when the deal was created (truncated)"
+        tests:
+          - not_null
+
+  - name: int_deal_stage_transitions
+    description: "Deal stage transitions with stage metadata for funnel tracking"
+    columns:
+      - name: deal_id
+        description: "Foreign key to deals"
+        tests:
+          - not_null
+      - name: transitioned_at
+        description: "Timestamp when the deal entered this stage"
+        tests:
+          - not_null
+      - name: stage_id
+        description: "Foreign key to stages"
+        tests:
+          - not_null
+      - name: funnel_step
+        description: "Funnel step number (1-9)"
+
+  - name: int_deal_activities
+    description: "Completed sales activities (Sales Call 1, Sales Call 2) per deal"
+    columns:
+      - name: deal_id
+        description: "Foreign key to deals"
+        tests:
+          - not_null
+      - name: activity_type_code
+        description: "Type of activity (meeting, sc_2)"
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - 'meeting'
+                - 'sc_2'
+      - name: funnel_activity_name
+        description: "Human-readable activity name for funnel reporting"
+        tests:
+          - accepted_values:
+              values:
+                - 'Sales Call 1'
+                - 'Sales Call 2'
+
+  - name: int_deal_losses
+    description: "Lost deals with categorized loss reasons"
+    columns:
+      - name: deal_id
+        description: "Foreign key to deals"
+        tests:
+          - not_null
+      - name: lost_at
+        description: "Timestamp when the deal was marked as lost"
+        tests:
+          - not_null
+      - name: lost_month
+        description: "Month when the deal was lost (YYYY-MM format)"
+        tests:
+          - not_null
+      - name: lost_reason_id
+        description: "ID of the loss reason (1-5)"
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - 1
+                - 2
+                - 3
+                - 4
+                - 5
+      - name: lost_reason_label
+        description: "Human-readable loss reason"
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - 'Customer Not Ready'
+                - 'Pricing Issues'
+                - 'Unreachable Customer'
+                - 'Product Mismatch'
+                - 'Duplicate Entry'

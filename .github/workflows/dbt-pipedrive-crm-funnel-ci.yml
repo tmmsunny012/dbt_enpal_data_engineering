@@ -1,0 +1,206 @@
+# ==============================================================================
+# dbt CI/CD Pipeline - GitHub Actions Workflow
+# ==============================================================================
+#
+# PURPOSE:
+# This workflow automatically runs dbt models and tests whenever someone opens
+# a Pull Request (PR) or pushes to the main branch. This ensures that:
+#   1. All SQL models compile correctly
+#   2. All data quality tests pass
+#   3. No one can merge broken code into production
+#
+# HOW IT WORKS:
+# Since dbt tests are DATA tests (not just syntax checks), we need actual data
+# in a real database. The workflow:
+#   1. Spins up a PostgreSQL database using GitHub's "services" feature
+#   2. Loads the CSV source data into the database
+#   3. Runs `dbt build` which executes all models AND tests
+#
+# ==============================================================================
+
+name: dbt Pipedrive CRM Funnel CI
+
+# ------------------------------------------------------------------------------
+# TRIGGERS: When should this workflow run?
+# ------------------------------------------------------------------------------
+on:
+  # Run on every Pull Request targeting the main branch
+  pull_request:
+    branches:
+      - main
+
+    # Only trigger if these file types change (optimization)
+    paths:
+      - 'models/**'
+      - 'macros/**'
+      - 'tests/**'
+      - 'dbt_project.yml'
+      - 'profiles.yml'
+
+  # Also run on direct pushes to main (after merge)
+  push:
+    branches:
+      - main
+
+    paths:
+      - 'models/**'
+      - 'macros/**'
+      - 'tests/**'
+      - 'dbt_project.yml'
+      - 'profiles.yml'
+
+  # Allow manual triggering from GitHub UI (useful for debugging)
+  workflow_dispatch:
+
+# ------------------------------------------------------------------------------
+# JOBS: The actual work to be done
+# ------------------------------------------------------------------------------
+jobs:
+  dbt-test:
+    name: Run dbt Build & Tests
+    runs-on: ubuntu-latest
+    # Skip this job for draft PRs (saves full runtime)
+    if: github.event.pull_request.draft == false
+
+    # --------------------------------------------------------------------------
+    # SERVICES: Spin up a PostgreSQL database for testing
+    # --------------------------------------------------------------------------
+    # This is similar to running `docker compose up db` locally.
+    # GitHub Actions manages the container lifecycle automatically.
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_DB: postgres
+          POSTGRES_USER: admin
+          POSTGRES_PASSWORD: admin
+        ports:
+          - 5432:5432
+        # Health check: Wait for Postgres to be ready before proceeding
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    # --------------------------------------------------------------------------
+    # ENVIRONMENT VARIABLES
+    # --------------------------------------------------------------------------
+    env:
+      # Tell dbt where to find profiles.yml (in the repo root)
+      DBT_PROFILES_DIR: ${{ github.workspace }}
+      # Override the host to use the GitHub Actions service container
+      DBT_HOST: localhost
+
+    # --------------------------------------------------------------------------
+    # STEPS: Sequential actions to execute
+    # --------------------------------------------------------------------------
+    steps:
+      # Step 1: Get the code from the repository
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # Step 2: Install Python (required for dbt)
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'  # Cache pip dependencies for faster runs
+
+      # Step 3: Install dbt and the Postgres adapter
+      - name: Install dbt
+        run: |
+          pip install --upgrade pip
+          pip install dbt-core dbt-postgres
+
+      # Step 4: Load the source data into Postgres
+      # This replicates what `data_loader` does in docker-compose
+      - name: Load Source Data
+        env:
+          PGPASSWORD: admin
+        run: |
+          echo "Loading CSV data into PostgreSQL..."
+
+          # Install postgresql-client (needed for psql command)
+          # Note: This is pre-installed on GitHub Actions ubuntu-latest,
+          # but we install it explicitly for compatibility with local testing via 'act'
+          sudo apt-get update && sudo apt-get install -y postgresql-client
+
+          # Wait a moment for Postgres to fully initialize
+          sleep 5
+
+          # Create the raw schema and tables, then load CSVs
+          # (This is equivalent to what load_data.sh does)
+          # Table schemas must match CSV headers exactly
+          psql -h localhost -U admin -d postgres -c "
+            CREATE TABLE IF NOT EXISTS activity (
+              activity_id INTEGER,
+              type VARCHAR(50),
+              assigned_to_user INTEGER,
+              deal_id INTEGER,
+              done BOOLEAN,
+              due_to TIMESTAMP
+            );
+            CREATE TABLE IF NOT EXISTS activity_types (
+              id INTEGER,
+              name VARCHAR(100),
+              active VARCHAR(10),
+              type VARCHAR(50)
+            );
+            CREATE TABLE IF NOT EXISTS deal_changes (
+              deal_id INTEGER,
+              change_time TIMESTAMP,
+              changed_field_key VARCHAR(50),
+              new_value TEXT
+            );
+            CREATE TABLE IF NOT EXISTS fields (
+              ID INTEGER,
+              FIELD_KEY VARCHAR(50),
+              NAME VARCHAR(100),
+              FIELD_VALUE_OPTIONS TEXT
+            );
+            CREATE TABLE IF NOT EXISTS stages (
+              stage_id INTEGER,
+              stage_name VARCHAR(100)
+            );
+            CREATE TABLE IF NOT EXISTS users (
+              id INTEGER,
+              name VARCHAR(100),
+              email VARCHAR(100),
+              modified TIMESTAMP
+            );
+          "
+
+          # Copy CSV data into tables
+          for csv_file in raw_data/*.csv; do
+            table_name=$(basename "$csv_file" .csv)
+            echo "Loading $table_name..."
+            psql -h localhost -U admin -d postgres -c "\COPY $table_name FROM '$csv_file' WITH CSV HEADER"
+          done
+
+          echo "Data loading complete!"
+
+      # Step 5: Verify dbt can connect to the database
+      - name: Test dbt Connection
+        run: dbt debug
+
+      # Step 6: Install dbt packages (if any are defined in packages.yml)
+      - name: Install dbt Packages
+        run: dbt deps
+
+      # Step 7: THE MAIN EVENT - Run all models and tests
+      # `dbt build` is equivalent to running `dbt run` + `dbt test`
+      - name: Run dbt Build (Models + Tests)
+        run: dbt build
+
+      # Step 8: Show test results summary
+      - name: Display Test Summary
+        if: always()  # Run even if previous steps failed
+        run: |
+          echo "============================================"
+          echo "dbt Pipedrive CRM Funnel CI Pipeline Complete!"
+          echo "============================================"
+          echo "Check the logs above for:"
+          echo "  - Model compilation results"
+          echo "  - Test pass/fail status"
+          echo "============================================"
