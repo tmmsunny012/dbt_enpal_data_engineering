@@ -379,6 +379,26 @@ ORDER BY deals_lost DESC;
 
 ---
 
+## CI/CD Pipeline
+
+This project includes a GitHub Actions workflow that automatically runs dbt tests on every Pull Request.
+
+**How it works:**
+1. GitHub spins up a PostgreSQL database
+2. CSV source data is loaded into the database
+3. `dbt build` runs all models and tests
+4. PR is blocked if any test fails
+
+**Files:**
+- `.github/workflows/dbt-pipedrive-crm-funnel-ci.yml` - Check the workflow definition with detailed comments
+
+**Benefits:**
+- Catch data quality issues before they reach production
+- Enforce data contracts via automated testing
+- Provide an audit trail of all test runs
+
+---
+
 ## Original Task Requirements
 
 ## Project
