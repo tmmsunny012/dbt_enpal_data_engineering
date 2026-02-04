@@ -27,6 +27,7 @@ SELECT
     type AS activity_type_code,  -- Code used in activities table
 
     -- Convert string flag to boolean for easier querying
-    CASE WHEN LOWER(active) = 'yes' THEN TRUE ELSE FALSE END AS is_active
+    -- Source data has 'True'/'False' as strings (per init.sql VARCHAR(10))
+    CASE WHEN LOWER(active) IN ('true', 'yes', '1') THEN TRUE ELSE FALSE END AS is_active
 
 FROM source

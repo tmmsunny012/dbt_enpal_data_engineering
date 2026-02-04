@@ -41,7 +41,7 @@ on:
   push:
     branches:
       - main
-      - sales-funnel-model
+
     paths:
       - 'models/**'
       - 'macros/**'
@@ -121,46 +121,53 @@ jobs:
         run: |
           echo "Loading CSV data into PostgreSQL..."
 
+          # Install postgresql-client (needed for psql command)
+          # Note: This is pre-installed on GitHub Actions ubuntu-latest,
+          # but we install it explicitly for compatibility with local testing via 'act'
+          sudo apt-get update && sudo apt-get install -y postgresql-client
+
           # Wait a moment for Postgres to fully initialize
           sleep 5
 
           # Create the raw schema and tables, then load CSVs
           # (This is equivalent to what load_data.sh does)
+          # Table schemas must match CSV headers exactly
           psql -h localhost -U admin -d postgres -c "
-            CREATE TABLE IF NOT EXISTS activities (
-              id INTEGER,
-              deal_id INTEGER,
+            CREATE TABLE IF NOT EXISTS activity (
+              activity_id INTEGER,
               type VARCHAR(50),
+              assigned_to_user INTEGER,
+              deal_id INTEGER,
               done BOOLEAN,
-              due_date TIMESTAMP
+              due_to TIMESTAMP
             );
             CREATE TABLE IF NOT EXISTS activity_types (
               id INTEGER,
-              key_string VARCHAR(50),
-              name VARCHAR(100)
+              name VARCHAR(100),
+              active VARCHAR(10),
+              type VARCHAR(50)
             );
             CREATE TABLE IF NOT EXISTS deal_changes (
-              id INTEGER,
               deal_id INTEGER,
-              timestamp TIMESTAMP,
-              field_key VARCHAR(50),
-              old_value TEXT,
+              change_time TIMESTAMP,
+              changed_field_key VARCHAR(50),
               new_value TEXT
             );
             CREATE TABLE IF NOT EXISTS fields (
-              id INTEGER,
-              key VARCHAR(50),
-              options JSONB
+              ID INTEGER,
+              FIELD_KEY VARCHAR(50),
+              NAME VARCHAR(100),
+              FIELD_VALUE_OPTIONS TEXT
             );
             CREATE TABLE IF NOT EXISTS stages (
-              id INTEGER,
-              name VARCHAR(100),
-              order_nr INTEGER
+              stage_id INTEGER,
+              stage_name VARCHAR(100)
             );
             CREATE TABLE IF NOT EXISTS users (
               id INTEGER,
               name VARCHAR(100),
-              email VARCHAR(100)
+              email VARCHAR(100),
+              modified TIMESTAMP
             );
           "
 

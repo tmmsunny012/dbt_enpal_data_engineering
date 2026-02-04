@@ -397,6 +397,20 @@ This project includes a GitHub Actions workflow that automatically runs dbt test
 - Enforce data contracts via automated testing
 - Provide an audit trail of all test runs
 
+**Test Locally with `act`:**
+
+You can test the CI workflow on your machine before pushing using [act](https://github.com/nektos/act):
+
+```bash
+# Install act (Windows)
+winget install nektos.act
+
+# Run the workflow locally (requires Docker)
+act workflow_dispatch
+```
+
+This simulates the entire GitHub Actions workflow using Docker, so you can catch issues before they reach CI.
+
 ---
 
 ## Original Task Requirements
